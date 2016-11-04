@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">app</string>
+    <string name="app_name">iBeacon Scanner</string>
 
     <!-- Main Activity -->
     <string name="uuid">Uuid</string>
