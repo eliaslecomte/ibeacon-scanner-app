@@ -12,6 +12,15 @@ android {
         versionName "1.0"
     }
 
+    signingConfigs {
+        release {
+            storeFile file("ibeaconscannerapp.jks")
+            storePassword ibs_store_password
+            keyAlias ibs_key_alias
+            keyPassword ibs_key_password
+        }
+    }
+
     buildTypes {
         debug {
             minifyEnabled false
@@ -21,6 +30,7 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 
