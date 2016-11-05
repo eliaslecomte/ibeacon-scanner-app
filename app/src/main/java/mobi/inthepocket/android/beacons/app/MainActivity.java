@@ -2,40 +2,36 @@ package mobi.inthepocket.android.beacons.app;
 
 import android.Manifest;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.text.InputFilter;
-import android.text.TextUtils;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.widget.LinearLayout;
 
 import com.tbruyelle.rxpermissions.RxPermissions;
 
+import java.util.UUID;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
+import mobi.inthepocket.android.beacons.app.adapters.BeaconAdapter;
 import mobi.inthepocket.android.beacons.app.rxjava.RxObserver;
-import mobi.inthepocket.android.beacons.app.utils.InputFilterMinMax;
+import mobi.inthepocket.android.beacons.app.views.AbstractStateView;
+import mobi.inthepocket.android.beacons.app.views.ErrorView;
+import mobi.inthepocket.android.beacons.app.views.ScanningView;
 import mobi.inthepocket.android.beacons.ibeaconscanner.Beacon;
 import mobi.inthepocket.android.beacons.ibeaconscanner.Error;
 import mobi.inthepocket.android.beacons.ibeaconscanner.IBeaconScanner;
-import mobi.inthepocket.android.beacons.app.utils.UUIDUtils;
 
-public class MainActivity extends AppCompatActivity implements IBeaconScanner.Callback
+public class MainActivity extends AppCompatActivity implements IBeaconScanner.Callback, ErrorView.RetryClickListener
 {
-    @BindView(R.id.textview_log)
-    TextView textViewLog;
-    @BindView(R.id.edittext_uuid)
-    EditText editTextUuid;
-    @BindView(R.id.edittext_major)
-    EditText editTextMajor;
-    @BindView(R.id.edittext_minor)
-    EditText editTextMinor;
-    @BindView(R.id.button_start)
-    Button buttonStartScanning;
-    @BindView(R.id.button_stop)
-    Button buttonStopScanning;
+    @BindView(R.id.recyclerview)
+    RecyclerView recyclerView;
+    @BindView(R.id.layout_state)
+    LinearLayout layoutState;
+
+    private BeaconAdapter beaconAdapter;
+    private AbstractStateView stateView;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState)
@@ -47,9 +43,59 @@ public class MainActivity extends AppCompatActivity implements IBeaconScanner.Ca
 
         IBeaconScanner.getInstance().setCallback(this);
 
-        // add input filters on {@link EditText}s.
-        this.editTextMajor.setFilters(new InputFilter[]{new InputFilterMinMax("1", "65535")});
-        this.editTextMinor.setFilters(new InputFilter[]{new InputFilterMinMax("1", "65535")});
+        this.beaconAdapter = new BeaconAdapter(this);
+        this.recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        this.recyclerView.setAdapter(this.beaconAdapter);
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+
+        this.startScanning();
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+
+        this.beaconAdapter.clear();
+
+        IBeaconScanner.getInstance()
+                .stop();
+    }
+
+    //region Callback
+
+    @Override
+    public void didEnterBeacon(final Beacon beacon, int rssi)
+    {
+        this.beaconAdapter.updateBeacon(beacon, rssi);
+        this.updateView(this.beaconAdapter.getItemCount(), null);
+    }
+
+    @Override
+    public void didExitBeacon(final Beacon beacon)
+    {
+        this.beaconAdapter.removeBeacon(beacon);
+        this.updateView(this.beaconAdapter.getItemCount(), null);
+    }
+
+    @Override
+    public void monitoringDidFail(final Error error)
+    {
+        this.updateView(0, error);
+    }
+
+    //endregion
+
+    //region View
+
+    private void startScanning()
+    {
+        this.updateView(0, null);
 
         RxPermissions.getInstance(this)
                 .request(Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -60,111 +106,78 @@ public class MainActivity extends AppCompatActivity implements IBeaconScanner.Ca
                     {
                         if (granted)
                         {
-                            MainActivity.this.beaconsEnabled(true);
-                        } else
+                            // beacons enabled!
+                            IBeaconScanner.getInstance()
+                                    .startMonitoring(Beacon.newBuilder()
+                                            .setUUID(UUID.randomUUID())
+                                            .setMajor(1)
+                                            .setMinor(1)
+                                            .build());
+                        }
+                        else
                         {
-                            MainActivity.this.beaconsEnabled(false);
-                            // Oh no permission denied
+                            // todo
                         }
                     }
                 });
     }
 
-    @OnClick(R.id.button_start)
-    public void onButtonStartClicked()
+    private void updateView(final int itemCount, @Nullable Error error)
     {
-        if (this.isValid())
+        AbstractStateView view;
+
+        if (error != null)
         {
-            IBeaconScanner.getInstance().startMonitoring(Beacon.newBuilder()
-                    .setUUID(this.editTextUuid.getText().toString())
-                    .setMajor(Integer.valueOf(this.editTextMajor.getText().toString()))
-                    .setMinor(Integer.valueOf(this.editTextMinor.getText().toString()))
-                    .build());
+            view = new ErrorView(this);
+            ((ErrorView) view).setRetryClickListener(this);
+            ((ErrorView) view).setError(error);
+            this.addStateView(view);
+        }
+        else
+        {
+            if (itemCount > 0)
+            {
+                this.removeStateView(this.stateView);
+            }
+            else
+            {
+                view = new ScanningView(this);
+                this.addStateView(view);
+            }
         }
     }
 
-    @OnClick(R.id.button_stop)
-    public void onButtonStopClicked()
+    private void addStateView(final AbstractStateView view)
     {
-        IBeaconScanner.getInstance().stop();
+        if (this.stateView != null)
+        {
+            this.removeStateView(this.stateView);
+        }
+
+        if (this.layoutState != null && view != null)
+        {
+            this.layoutState.addView(view);
+
+            this.stateView = view;
+        }
     }
 
-    //region Callback
-
-    @Override
-    public void didEnterBeacon(final Beacon beacon)
+    private void removeStateView(final AbstractStateView view)
     {
-        final String logMessage = String.format("Entered beacon with UUID %s and major %s and minor %s.", beacon.getUUID(), beacon.getMajor(), beacon.getMinor());
-        this.updateLog(logMessage);
-    }
-
-    @Override
-    public void didExitBeacon(final Beacon beacon)
-    {
-        final String logMessage = String.format("Exited beacon with UUID %s and major %s and minor %s.", beacon.getUUID(), beacon.getMajor(), beacon.getMinor());
-        this.updateLog(logMessage);
-    }
-
-    @Override
-    public void monitoringDidFail(final Error error)
-    {
-        Toast.makeText(MainActivity.this, "Could not scan due to " + error.name(), Toast.LENGTH_LONG).show();
+        if (this.layoutState != null)
+        {
+            this.layoutState.removeView(view);
+        }
     }
 
     //endregion
 
-    //region View
+    //region to
 
-    private void beaconsEnabled(final boolean isEnabled)
+    @Override
+    public void OnRetryClicked()
     {
-        this.buttonStartScanning.setEnabled(isEnabled);
-        this.buttonStopScanning.setEnabled(isEnabled);
-    }
-
-    private boolean isValid()
-    {
-        boolean isValid = true;
-
-        if (UUIDUtils.isValidUUID(this.editTextUuid.getText().toString()))
-        {
-            isValid = false;
-            this.editTextUuid.setError(this.getString(R.string.uuid_error));
-        }
-        else
-        {
-            this.editTextUuid.setError(null);
-        }
-
-        final String major = this.editTextMajor.getText().toString();
-        if (TextUtils.isEmpty(major))
-        {
-            isValid = false;
-            this.editTextMajor.setError(this.getString(R.string.major_error));
-        }
-        else
-        {
-            this.editTextMajor.setError(null);
-        }
-
-        final String minor = this.editTextMinor.getText().toString();
-        if (TextUtils.isEmpty(minor))
-        {
-            isValid = false;
-            this.editTextMinor.setError(this.getString(R.string.minor_error));
-        }
-        else
-        {
-            this.editTextMinor.setError(null);
-        }
-
-        return isValid;
-    }
-
-    private void updateLog(final String logMessage)
-    {
-        final String logText = this.textViewLog.getText().toString();
-
-        this.textViewLog.setText(logMessage + "\n\n" + logText);
+        this.startScanning();
     }
 
     //endregion

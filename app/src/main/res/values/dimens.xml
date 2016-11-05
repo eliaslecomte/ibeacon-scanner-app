@@ -1,6 +1,7 @@
 <resources>
 
     <dimen name="padding_large">16dp</dimen>
+    <dimen name="padding_medium">8dp</dimen>
 
     <!-- Font sizes -->
     <dimen name="text_title">21sp</dimen>
