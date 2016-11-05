@@ -28,7 +28,7 @@ import mobi.inthepocket.android.beacons.ibeaconscanner.utils.ConversionUtils;
  * Class is responseable for:
  * - Reading beacon information from {@link ScanResult}s that are triggered by the {@link android.bluetooth.le.BluetoothLeScanner}.
  * - Bookkeeping of beacon triggers so it can determine weather a beacon entered or exited a {@link Beacon}.
- * - Calling {@link IBeaconScanner.Callback#didEnterBeacon(Beacon)} and
+ * - Calling {@link IBeaconScanner.Callback#didEnterBeacon(Beacon, int)} and
  *  {@link IBeaconScanner.Callback#didExitBeacon(Beacon)}.
  */
 
@@ -110,40 +110,15 @@ public class ScannerScanCallback extends ScanCallback implements TimeoutHandler.
                         .setMinor(minor)
                         .build();
 
-                // see if the beacon was not yet triggered
+                // always trigger beacon enters
+                this.callback.didEnterBeacon(beacon, scanResult.getRssi());
+
+                // add the enter beacon to database
                 final Uri uri = getItemUri(beacon);
-                final Cursor cursor = this.beaconsSeenProvider.query(uri);
-                if (cursor != null)
-                {
-                    final List<BeaconSeen> beaconSeens = new ArrayList<>();
-                    if (cursor.moveToFirst())
-                    {
-                        do
-                        {
-                            final BeaconSeen beaconSeen = new BeaconSeen();
-                            beaconSeen.constructFromCursor(cursor);
-                            beaconSeens.add(beaconSeen);
-                        }
-                        while (cursor.moveToNext());
-                    }
+                this.beaconsSeenProvider.insert(uri, BeaconSeen.getContentValues(beacon, SystemClock.elapsedRealtime()));
 
-                    cursor.close();
-
-                    if (beaconSeens.isEmpty())
-                    {
-                        // this beacon is not yet in our database, trigger {@link IBeaconScanner.Callback#didEnterBeacon}
-                        if (this.callback != null)
-                        {
-                            this.callback.didEnterBeacon(beacon);
-                        }
-                    }
-
-                    // add the enter beacon to database
-                    this.beaconsSeenProvider.insert(uri, BeaconSeen.getContentValues(beacon, SystemClock.elapsedRealtime()));
-
-                    // add beacon to our onExitHandler
-                    this.onExitHandler.passItem(beacon);
-                }
+                // add beacon to our onExitHandler
+                this.onExitHandler.passItem(beacon);
             }
         }
     }

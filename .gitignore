@@ -36,3 +36,4 @@ build/
 crashlytics-build.properties
 
 /build/intermediates/
+app/ibeaconscannerapp.jks

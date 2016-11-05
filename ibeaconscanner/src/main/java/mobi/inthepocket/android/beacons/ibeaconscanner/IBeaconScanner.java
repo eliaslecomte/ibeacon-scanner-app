@@ -153,7 +153,7 @@ public final class IBeaconScanner implements TimeoutHandler.TimeoutCallback<Obje
     {
         final ScanSettings.Builder builder = new ScanSettings.Builder();
         builder.setReportDelay(0);
-        builder.setScanMode(ScanSettings.SCAN_MODE_LOW_POWER);
+        builder.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);
         return builder.build();
     }
 
@@ -314,7 +314,7 @@ public final class IBeaconScanner implements TimeoutHandler.TimeoutCallback<Obje
          *
          * @param beacon
          */
-        void didEnterBeacon(Beacon beacon);
+        void didEnterBeacon(Beacon beacon, int rssi);
 
         /**
          * Device is outside the range of {@code beacon}.

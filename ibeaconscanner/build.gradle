@@ -1,32 +1,26 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.jfrog.bintray'
-apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'jacoco'
 
 def projectVersionCodeNr = Integer.parseInt(projectVersionCode);
-def projectGit = projectGit;
-def projectUrl = projectUrl;
-def projectDescription = projectDescription
 def libGroupId = libGroupId;
-def libArtifactId = libArtifactId;
 
 group = libGroupId
 version = projectVersion
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.2"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.0"
 
     defaultConfig {
         minSdkVersion 11
-        targetSdkVersion 24
+        targetSdkVersion 25
         versionCode projectVersionCodeNr
         versionName projectVersion
         consumerProguardFiles 'proguard-rules.pro'
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        buildConfigField 'long', 'BEACON_EXIT_TIME_IN_MILLIS', '20L * 1000L'
+        buildConfigField 'long', 'BEACON_EXIT_TIME_IN_MILLIS', '10L * 1000L'
         buildConfigField 'long', 'ADD_BEACON_TIMEOUT_IN_MILLIS', '375L'
     }
 
@@ -45,7 +39,7 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-annotations:24.2.1'
+    compile 'com.android.support:support-annotations:25.0.0'
 
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
@@ -56,49 +50,6 @@ dependencies {
 
 configurations {
     deployerJars
-}
-
-install {
-    repositories.mavenInstaller {
-        pom.project {
-            name libArtifactId
-            description projectDescription
-            url projectUrl
-            inceptionYear '2016'
-
-            packaging 'aar'
-            groupId libGroupId
-            artifactId libArtifactId
-            version projectVersion
-
-            licenses {
-                license {
-                    name 'MIT'
-                    url 'https://github.com/inthepocket/ibeacon-scanner-android/blob/master/LICENSE.md'
-                }
-            }
-        }
-    }
-}
-
-bintray() {
-    user = hasProperty('bintray_user') ? bintray_user : System.getenv('bintray_user')
-    key = hasProperty('bintray_apikey') ? bintray_apikey : System.getenv('bintray_apikey')
-    pkg {
-        repo = libGroupId
-        name = libArtifactId
-        userOrg = hasProperty('bintray_user') ? bintray_user : System.getenv('bintray_user')
-        licenses = ['MIT']
-        vcsUrl = projectGit
-        version {
-            name = projectVersion
-            gpg {
-                sign = true
-                passphrase = hasProperty('bintray_gpg_phrase') ? bintray_gpg_phrase : System.getenv('bintray_gpg_phrase')
-            }
-        }
-    }
-    configurations = ['archives']
 }
 
 task javadoc(type: Javadoc) {
@@ -121,13 +72,4 @@ task sourcesJar(type: Jar) {
 artifacts {
     archives javadocJar
     archives sourcesJar
-}
-
-sonarqube {
-    properties {
-        property "sonar.java.coveragePlugin", "jacoco"
-        property "sonar.jacoco.reportPath", "build/jacoco/testDebugUnitTest.exec"
-        property "sonar.junit.reportsPath", "build/test-results/debug/" // path to junit reports
-        property "sonar.android.lint.report", "build/outputs/lint-results-debug.xml" // path to lint reports
-    }
 }
