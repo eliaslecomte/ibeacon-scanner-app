@@ -4,6 +4,8 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -21,6 +23,10 @@ public class ErrorView extends AbstractStateView
 {
     @BindView(R.id.textview_error)
     TextView textViewError;
+    @BindView(R.id.button_turn_bluetooth_on)
+    Button buttonTurnBluetoothOn;
+    @BindView(R.id.button_retry)
+    Button buttonRetry;
 
     private RetryClickListener retryClickListener;
 
@@ -46,43 +52,64 @@ public class ErrorView extends AbstractStateView
         this.setGravity(Gravity.CENTER);
     }
 
+    @OnClick(R.id.button_turn_bluetooth_on)
+    public void onButtonTurnBluetoothOnClicked()
+    {
+        if (this.retryClickListener != null)
+        {
+            this.retryClickListener.onBluetoothOnClicked();
+        }
+    }
+
     @OnClick(R.id.button_retry)
     public void onButtonRetryClicked()
     {
         if (this.retryClickListener != null)
         {
-            this.retryClickListener.OnRetryClicked();
+            this.retryClickListener.onRetryClicked();
         }
     }
 
     public void setError(final Error error)
     {
-        final int errorResourceId;
+        final int errorResourceId, turnBluetoothOnVisibility, retryVisibility;
 
         switch (error)
         {
             case NO_BLUETOOTH_LE:
                 errorResourceId = R.string.state_no_bluetooth;
+                turnBluetoothOnVisibility = View.GONE;
+                retryVisibility = View.GONE;
                 break;
 
             case BLUETOOTH_OFF:
                 errorResourceId = R.string.state_bluetooth_off;
+                turnBluetoothOnVisibility = View.VISIBLE;
+                retryVisibility = View.GONE;
                 break;
 
             case LOCATION_OFF:
                 errorResourceId = R.string.state_location_off;
+                turnBluetoothOnVisibility = View.GONE;
+                retryVisibility = View.VISIBLE;
                 break;
 
             case NO_LOCATION_PERMISSION:
                 errorResourceId = R.string.state_no_permission;
+                turnBluetoothOnVisibility = View.GONE;
+                retryVisibility = View.VISIBLE;
                 break;
 
             default:
                 errorResourceId = R.string.state_general_error;
+                turnBluetoothOnVisibility = View.GONE;
+                retryVisibility = View.VISIBLE;
                 break;
         }
 
         this.textViewError.setText(this.getContext().getString(errorResourceId));
+        this.buttonTurnBluetoothOn.setVisibility(turnBluetoothOnVisibility);
+        this.buttonRetry.setVisibility(retryVisibility);
     }
 
     //region Properties
@@ -98,7 +125,8 @@ public class ErrorView extends AbstractStateView
 
     public interface RetryClickListener
     {
-        void OnRetryClicked();
+        void onRetryClicked();
+        void onBluetoothOnClicked();
     }
 
     //endregion

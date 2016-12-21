@@ -11,6 +11,13 @@
         android:text="@string/state_general_error"/>
 
     <Button
+        android:id="@+id/button_turn_bluetooth_on"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/button_turn_bluetooth_on"
+        android:visibility="gone"/>
+
+    <Button
         android:id="@+id/button_retry"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

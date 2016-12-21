@@ -10,5 +10,6 @@
     <string name="state_no_bluetooth">There is no bluetooth on this device.</string>
     <string name="state_bluetooth_off">Bluetooth is not on.</string>
     <string name="state_location_off">Location is not on.</string>
+    <string name="button_turn_bluetooth_on">Turn Bluetooth on</string>
     <string name="button_retry">Retry!</string>
 </resources>
