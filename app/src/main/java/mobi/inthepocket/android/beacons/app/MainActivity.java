@@ -1,6 +1,8 @@
 package mobi.inthepocket.android.beacons.app;
 
 import android.Manifest;
+import android.bluetooth.BluetoothAdapter;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +27,8 @@ import mobi.inthepocket.android.beacons.ibeaconscanner.IBeaconScanner;
 
 public class MainActivity extends AppCompatActivity implements IBeaconScanner.Callback, ErrorView.RetryClickListener
 {
+    private static final int REQUEST_BLUETOOTH_ON = 123;
+
     @BindView(R.id.recyclerview)
     RecyclerView recyclerView;
     @BindView(R.id.layout_state)
@@ -66,6 +70,8 @@ public class MainActivity extends AppCompatActivity implements IBeaconScanner.Ca
         IBeaconScanner.getInstance()
                 .stop();
     }
+
+
 
     //region Callback
 
@@ -172,12 +178,21 @@ public class MainActivity extends AppCompatActivity implements IBeaconScanner.Ca
 
     //endregion
 
-    //region to
+    //region RetryClickListener
 
     @Override
-    public void OnRetryClicked()
+    public void onRetryClicked()
     {
         this.startScanning();
+    }
+
+    @Override
+    public void onBluetoothOnClicked()
+    {
+        if (!BluetoothAdapter.getDefaultAdapter().isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_BLUETOOTH_ON);
+        }
     }
 
     //endregion
