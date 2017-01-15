@@ -6,18 +6,49 @@
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/padding_large">
 
-    <TextView
-        android:id="@+id/textview_UUID"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="4de4a450-5357-41a5-aa96-36fe0637c4c3"/>
+    <LinearLayout
+        android:id="@+id/layout_ibeacon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/textview_UUID"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="8"
+            android:padding="@dimen/padding_small"
+            tools:text="4de4a450-5357-41a5-aa96-36fe0637c4c3"/>
+
+        <TextView
+            android:id="@+id/textview_major"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="@dimen/padding_small"
+            android:textAlignment="textEnd"
+            android:gravity="end"
+            tools:text="15"/>
+
+        <TextView
+            android:id="@+id/textview_minor"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="@dimen/padding_small"
+            android:textAlignment="textEnd"
+            android:gravity="end"
+            tools:text="2"/>
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/textview_rssi"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/padding_large"
+        android:layout_below="@id/layout_ibeacon"
         android:layout_alignParentRight="true"
+        android:layout_marginLeft="@dimen/padding_large"
+        android:padding="@dimen/padding_small"
         tools:text="-81"/>
 
     <ProgressBar
@@ -27,8 +58,10 @@
         android:layout_height="wrap_content"
         android:indeterminate="false"
         android:max="254"
-        android:layout_below="@id/textview_UUID"
+        android:layout_below="@id/layout_ibeacon"
+        android:layout_toLeftOf="@id/textview_rssi"
         android:layout_marginTop="@dimen/padding_medium"
+        android:padding="@dimen/padding_small"
         tools:progress="208"/>
 
 </RelativeLayout>
