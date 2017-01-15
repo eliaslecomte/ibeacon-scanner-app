@@ -41,8 +41,8 @@ android {
 
 dependencies {
     compile project(':ibeaconscanner') // library to scan for iBeacons
-    compile 'com.android.support:appcompat-v7:25.0.0'
-    compile 'com.android.support:design:25.0.0'
+    compile 'com.android.support:appcompat-v7:25.1.0'
+    compile 'com.android.support:design:25.1.0'
     compile 'io.reactivex:rxjava:1.2.0' // rxjava
     compile 'com.tbruyelle.rxpermissions:rxpermissions:0.7.0@aar' // library to handle location permission
     compile 'com.facebook.stetho:stetho:1.4.1' // stetho to easily see our database
