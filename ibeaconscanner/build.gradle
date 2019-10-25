@@ -8,12 +8,12 @@ group = libGroupId
 version = projectVersion
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 28
     buildToolsVersion "25.0.1"
 
     defaultConfig {
-        minSdkVersion 11
-        targetSdkVersion 25
+        minSdkVersion 14
+        targetSdkVersion 28
         versionCode projectVersionCodeNr
         versionName projectVersion
         consumerProguardFiles 'proguard-rules.pro'
@@ -39,7 +39,7 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-annotations:25.1.0'
+    compile 'com.android.support:support-annotations:28.0.0'
 
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
