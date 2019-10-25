@@ -12,8 +12,8 @@ import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresPermission;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresPermission;
 
 import java.util.ArrayList;
 import java.util.HashSet;
