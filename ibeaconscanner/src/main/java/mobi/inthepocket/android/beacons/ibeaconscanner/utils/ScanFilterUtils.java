@@ -3,7 +3,7 @@ package mobi.inthepocket.android.beacons.ibeaconscanner.utils;
 import android.annotation.TargetApi;
 import android.bluetooth.le.ScanFilter;
 import android.os.Build;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import mobi.inthepocket.android.beacons.ibeaconscanner.interfaces.BeaconInterface;
 

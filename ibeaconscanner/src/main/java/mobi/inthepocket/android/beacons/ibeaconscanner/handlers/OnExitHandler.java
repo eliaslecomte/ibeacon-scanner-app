@@ -1,6 +1,6 @@
 package mobi.inthepocket.android.beacons.ibeaconscanner.handlers;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import mobi.inthepocket.android.beacons.ibeaconscanner.Beacon;
 

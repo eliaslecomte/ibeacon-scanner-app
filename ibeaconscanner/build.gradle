@@ -1,24 +1,23 @@
 apply plugin: 'com.android.library'
 apply plugin: 'jacoco'
 
-def projectVersionCodeNr = Integer.parseInt(projectVersionCode);
-def libGroupId = libGroupId;
+def projectVersionCodeNr = Integer.parseInt(projectVersionCode)
+def libGroupId = libGroupId
 
 group = libGroupId
 version = projectVersion
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.1"
+    compileSdkVersion 29
 
     defaultConfig {
-        minSdkVersion 11
-        targetSdkVersion 25
+        minSdkVersion 14
+        targetSdkVersion 29
         versionCode projectVersionCodeNr
         versionName projectVersion
         consumerProguardFiles 'proguard-rules.pro'
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField 'long', 'BEACON_EXIT_TIME_IN_MILLIS', '10L * 1000L'
         buildConfigField 'long', 'ADD_BEACON_TIMEOUT_IN_MILLIS', '375L'
@@ -39,13 +38,13 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-annotations:25.1.0'
+    implementation 'androidx.annotation:annotation:1.1.0'
 
-    androidTestCompile 'com.android.support.test:runner:0.5'
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation('androidx.test.espresso:espresso-core:3.1.0', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    testCompile 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.12'
 }
 
 configurations {
