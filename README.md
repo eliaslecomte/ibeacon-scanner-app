@@ -2,7 +2,7 @@
 
 [![MIT License][license-image]][license-url]
 
-Android app to scan for iBeacons build on top of [iBeacon-Scanner-Android library](https://github.com/inthepocket/ibeacon-scanner-android).
+Android app to scan for iBeacons build on top of [iBeacon-Scanner-Android library](https://github.com/inthepocket/ibeacon-scanner-android). Published on the [Google play store](https://play.google.com/store/apps/details?id=be.createweb.beaconscanner).
 
 ## License
 
