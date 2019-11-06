@@ -37,6 +37,6 @@ public final class BluetoothUtils
     public static boolean isBluetoothOn()
     {
         final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        return bluetoothAdapter.isEnabled();
+        return bluetoothAdapter != null && bluetoothAdapter.isEnabled();
     }
 }
