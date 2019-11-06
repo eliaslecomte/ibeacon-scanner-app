@@ -13,6 +13,7 @@ import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.os.Build;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresPermission;
 
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public final class IBeaconScanner implements TimeoutHandler.TimeoutCallback<Obje
     private static IBeaconScanner instance;
 
     private final Context context;
-    private BluetoothLeScanner bluetoothLeScanner;
+    @Nullable private BluetoothLeScanner bluetoothLeScanner;
     private final ScannerScanCallback scannerScanCallback;
     private Callback callback;
 
@@ -50,7 +51,9 @@ public final class IBeaconScanner implements TimeoutHandler.TimeoutCallback<Obje
         this.context = initializer.context;
         this.scannerScanCallback = new ScannerScanCallback(beaconsSeenProvider, initializer.exitTimeoutInMillis);
         final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        this.bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
+        if (bluetoothAdapter != null) {
+            this.bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
+        }
 
         this.addBeaconsHandler = new AddBeaconsHandler(this, initializer.addBeaconTimeoutInMillis);
         this.timeoutObject = new Object();
